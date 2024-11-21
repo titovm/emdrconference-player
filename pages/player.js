@@ -50,7 +50,7 @@ export default function Player() {
   // Render the video player and embed code
   return (
     <div>
-      <h1>Video Player</h1>
+      <h1 className="text-3xl font-bold mb-6">Video Player</h1>
       {signedUrl ? (
         <video
           src={signedUrl}
@@ -63,10 +63,11 @@ export default function Player() {
         <p>Video is unavailable.</p>
       )}
 
-      <p>Embed Code:</p>
+      <p className='mt-6'>Embed Code:</p>
       <textarea
+        className='border p-2 mb-4'
         readOnly
-        style={{ width: '100%', height: '50px' }}
+        style={{ width: '100%', height: '120px' }}
         value={`<iframe src="${window.location.origin}/embed?file=${encodeURIComponent(
           file
         )}" frameborder="0" allowfullscreen></iframe>`}

@@ -71,11 +71,27 @@ export default function List() {
                 <Link className="underline text-blue-500" href={`/player?file=${encodeURIComponent(file.key)}`}>
                   {displayName}
                 </Link>
-                <button
-                  className="ml-4 font-bold underline text-blue-500"
+                {/* Button to copy the embed link */}
+                  <button
                   onClick={() => copyToClipboard(file.key)}
+                  className="text-green-500 hover:text-green-700"
+                  aria-label="Copy Embed Link"
                 >
-                  Скопировать ссылку
+                  {/* SVG Icon */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M7.5 12h9m-9 0L9.75 9.75M7.5 12l2.25 2.25M16.5 21h-9a3 3 0 01-3-3v-9a3 3 0 013-3h9a3 3 0 013 3v9a3 3 0 01-3 3z"
+                    />
+                  </svg>
                 </button>
               </li>
             );
