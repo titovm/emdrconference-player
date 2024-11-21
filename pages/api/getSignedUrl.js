@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     const signedUrl = await s3.getSignedUrlPromise('getObject', {
       Bucket: process.env.S3_BUCKET_NAME,
       Key: file,
-      Expires: 3600, // URL valid for 1 hour
+      Expires: 10800, // URL valid for 3 hours
     });
 
     res.status(200).json({ signedUrl });
