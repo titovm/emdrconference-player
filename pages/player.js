@@ -67,7 +67,7 @@ export default function Player() {
       <textarea
         readOnly
         style={{ width: '100%', height: '50px' }}
-        value={`<iframe src="${window.location.origin}/player?file=${encodeURIComponent(
+        value={`<iframe src="${window.location.origin}/embed?file=${encodeURIComponent(
           file
         )}" frameborder="0" allowfullscreen></iframe>`}
       />

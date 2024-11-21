@@ -4,9 +4,7 @@ import Link from 'next/link';
 export default function List() {
   const [files, setFiles] = useState([]);
   const [error, setError] = useState(null);
-
-  // Expose the S3 folder name to the client side
-  const rootDir = process.env.NEXT_PUBLIC_S3_FOLDER_NAME || '';
+  const [copiedMessage, setCopiedMessage] = useState(false); // State to control the visibility of the "Copied" message
 
   useEffect(() => {
     async function fetchFiles() {
@@ -24,6 +22,21 @@ export default function List() {
     fetchFiles();
   }, []);
 
+  // Function to copy the embed link to the clipboard
+  const copyToClipboard = (fileKey) => {
+    const embedLink = `${window.location.origin}/embed?file=${encodeURIComponent(fileKey)}`;
+    navigator.clipboard
+      .writeText(embedLink)
+      .then(() => {
+        setCopiedMessage(true); // Show the "Copied" message
+        setTimeout(() => setCopiedMessage(false), 2000); // Hide after 2 seconds
+      })
+      .catch((err) => {
+        console.error('Failed to copy link:', err);
+        alert('Failed to copy link. Please try again.');
+      });
+  };
+
   if (error) {
     return (
       <div>
@@ -35,26 +48,35 @@ export default function List() {
 
   return (
     <div>
-      <h1>Video Browser</h1>
+      {/* Show the copied message at the top when visible */}
+      {copiedMessage && (
+        <div className="fixed top-0 left-0 right-0 bg-green-500 text-white text-center p-2">
+          Copied to clipboard!
+        </div>
+      )}
+
+      <h1 className="text-3xl font-bold mb-6">Video Browser</h1>
       {files.length === 0 ? (
         <p>Loading files...</p>
       ) : (
         <ul>
-          {files.map((file, index) => {
-            // Remove the root directory from the file key for display
-            const displayName = file.key.startsWith(`${rootDir}/`)
-              ? file.key.slice(rootDir.length + 1)
-              : file.key;
+          {/* Skip the first line and remove "EMDR2024/" from file names */}
+          {files.slice(1).map((file, index) => {
+            // Remove "EMDR2024/" from the beginning of the file key
+            const displayName = file.key.replace(/^EMDR2024\//, '');
 
             return (
               <li key={index}>
                 {/* Link to the player with the full file key */}
-                <Link href={`/player?file=${encodeURIComponent(file.key)}`}>
+                <Link className="underline text-blue-500" href={`/player?file=${encodeURIComponent(file.key)}`}>
                   {displayName}
                 </Link>
-                <Link href={`/embed?file=${encodeURIComponent(file.key)}`}>
-                  Embed
-                </Link>
+                <button
+                  className="ml-4 font-bold underline text-blue-500"
+                  onClick={() => copyToClipboard(file.key)}
+                >
+                  Скопировать ссылку
+                </button>
               </li>
             );
           })}
