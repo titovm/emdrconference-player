@@ -52,6 +52,9 @@ export default function List() {
                 <Link href={`/player?file=${encodeURIComponent(file.key)}`}>
                   {displayName}
                 </Link>
+                <Link href={`/embed?file=${encodeURIComponent(file.key)}`}>
+                  Embed
+                </Link>
               </li>
             );
           })}
