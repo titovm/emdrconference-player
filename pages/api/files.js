@@ -1,7 +1,5 @@
 import AWS from 'aws-sdk';
 
-export const runtime = 'edge';
-
 export default async function handler(req, res) {
   // Validate HTTP method
   if (req.method !== 'GET') {
