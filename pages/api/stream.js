@@ -10,8 +10,6 @@ const s3 = new AWS.S3({
   s3ForcePathStyle: true, // Required for Wasabi or path-style S3
 });
 
-export const runtime = 'edge';
-
 export default async function handler(req, res) {
   const { file } = req.query;
   const range = req.headers.range;
