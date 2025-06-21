@@ -1,4 +1,5 @@
-import AWS from 'aws-sdk';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -12,18 +13,23 @@ export default async function handler(req, res) {
   }
 
   try {
-    const s3 = new AWS.S3({
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    const s3Client = new S3Client({
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      },
       region: process.env.AWS_REGION,
       endpoint: process.env.S3_ENDPOINT,
-      s3ForcePathStyle: true,
+      forcePathStyle: true,
     });
 
-    const signedUrl = await s3.getSignedUrlPromise('getObject', {
+    const command = new GetObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME,
       Key: file,
-      Expires: 10800, // URL valid for 3 hours
+    });
+
+    const signedUrl = await getSignedUrl(s3Client, command, {
+      expiresIn: 10800, // URL valid for 3 hours
     });
 
     res.status(200).json({ signedUrl });

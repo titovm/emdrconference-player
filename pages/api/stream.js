@@ -51,6 +51,14 @@ export default async function handler(req, res) {
 
   console.log('Stream request for file:', file);
   console.log('Range header:', range);
+  console.log('Environment check:', {
+    hasS3Bucket: !!process.env.S3_BUCKET_NAME,
+    hasAccessKey: !!process.env.AWS_ACCESS_KEY_ID,
+    hasSecretKey: !!process.env.AWS_SECRET_ACCESS_KEY,
+    hasRegion: !!process.env.AWS_REGION,
+    hasEndpoint: !!process.env.S3_ENDPOINT,
+    nodeEnv: process.env.NODE_ENV
+  });
 
   if (!file) {
     return res.status(400).json({ error: "File parameter is required" });

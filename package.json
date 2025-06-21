@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.832.0",
+    "@aws-sdk/s3-request-presigner": "^3.832.0",
     "dotenv": "^16.4.5",
     "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",
