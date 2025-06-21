@@ -1,5 +1,24 @@
 import { S3Client, GetObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
 
+// Helper function to get content type from file extension
+function getContentTypeFromFile(filename) {
+  const ext = filename.toLowerCase().split('.').pop();
+  const contentTypes = {
+    'mp4': 'video/mp4',
+    'webm': 'video/webm',
+    'ogg': 'video/ogg',
+    'avi': 'video/x-msvideo',
+    'mov': 'video/quicktime',
+    'wmv': 'video/x-ms-wmv',
+    'flv': 'video/x-flv',
+    'mkv': 'video/x-matroska',
+    'm4v': 'video/x-m4v',
+    '3gp': 'video/3gpp',
+    'ts': 'video/mp2t'
+  };
+  return contentTypes[ext] || 'video/mp4';
+}
+
 // Configure AWS SDK v3 for Wasabi
 const s3Client = new S3Client({
   credentials: {
@@ -18,6 +37,15 @@ const s3Client = new S3Client({
 
 
 export default async function handler(req, res) {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Range, Content-Type');
+    res.setHeader('Access-Control-Max-Age', '86400');
+    return res.status(200).end();
+  }
+
   const { file } = req.query;
   const range = req.headers.range;
 
@@ -80,12 +108,21 @@ export default async function handler(req, res) {
 
     console.log('Streaming bytes:', isPartialContent ? `${start}-${end}/${fileSize}` : `full file (${fileSize} bytes)`);
 
-    // Set appropriate headers
+    // Set appropriate headers for video streaming
+    // Force correct content type based on file extension since S3 might not have it set
+    const contentType = getContentTypeFromFile(decodedFile);
     const headers = {
-      "Content-Type": headResult.ContentType || "video/mp4",
+      "Content-Type": contentType,
       "Accept-Ranges": "bytes",
       "Content-Length": end - start + 1,
-      "Cache-Control": "public, max-age=3600"
+      "Cache-Control": "public, max-age=3600",
+      // Headers to prevent download and enable inline playback
+      "Content-Disposition": "inline",
+      // CORS headers for iframe embedding
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+      "Access-Control-Allow-Headers": "Range, Content-Type",
+      "X-Content-Type-Options": "nosniff"
     };
 
     if (isPartialContent) {
